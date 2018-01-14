@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>MPAS Feed Archives</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <link rel="stylesheet" href="../css/w3.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+    <script src="../js/w3.js"></script>
+	<script type="text/javascript">
+		function doFtp(action, path) {
+			alert('WAIT' + path);
+			document.forms['file-list'].action = action + 'some';	
+			document.forms['file-list']['currentResourcePath'].value = path;
+			
+			document.forms['file-list'].submit();
+		}
+	</script>    
+    
+</head>
+<body>
+
+	<pre><b>MPAS Feed Archives</b></pre>
+	<form action="/filelist" name="file-list" id="file-list">
+			<pre><b>Enter Path : </b><input type="text" name="path" th:value="${currentpath}" size="80"></input><input type="submit" class="like" value="List Files" /></pre>
+			<pre><input type="text" name="currentResourcePath" th:value="${currentResourcePath}" size="80"></input></pre>
+	</form>
+	<pre><b th:text="'Listing Files On Path : ' + ${currentpath}" ></b>
+    
+    
+    <table border="1" id="tbl_file" class="w3-table w3-bordered w3-border w3-margin-top">
+    <tr>
+    	<th onclick="w3.sortHTML('#tbl_file','.file-row', 'td:nth-child(1)')" class="w3-dark-grey w3-hover-black" align="left" width="2%"># <i class="fa fa-sort" style="font-size:13px;"></i></th>
+    	<th onclick="w3.sortHTML('#tbl_file','.file-row', 'td:nth-child(2)')" class="w3-dark-grey w3-hover-black" align="left" width="8%">Type <i class="fa fa-sort" style="font-size:13px;"></i></th>
+    	<th onclick="w3.sortHTML('#tbl_file','.file-row', 'td:nth-child(4)')" class="w3-dark-grey w3-hover-black" align="left" width="68%">Name <i class="fa fa-sort" style="font-size:13px;"></i></th>
+    	<th onclick="w3.sortHTML('#tbl_file','.file-row', 'td:nth-child(3)')" class="w3-dark-grey w3-hover-black" align="left" width="22%">Last Modified <i class="fa fa-sort" style="font-size:13px;"></i></th>
+    </tr>
+    <!-- <tr th:each="resource,itrStat : ${resources}"  th:class="${itrStat.even}? 'even_css_class item':'odd_css_class item'" >  -->
+    
+    <tr th:each="resource,itrStat : ${resources}" class="file-row">
+    
+    	<!-- Row Num  -->
+    	<td th:text="${itrStat.index+1}">#</td>
+    	
+    	<!-- Resource Type  -->
+    	<td th:if="${resource.isFolder}">Folder</td><!-- IF FOLDER -->
+		<td th:unless="${resource.isFolder}">File</td><!-- ELSE IF FILE  -->
+		
+    	<!-- Resource Name -->
+    	<td th:if="${resource.isFolder}"><a th:text="${resource.name}" th:href="@{/filelist(path=${currentpath} + ${pathDelimiter} + ${resource.name})}">Name</a></td>
+    	<td th:unless="${resource.isFolder}"><a th:text="${resource.name}" th:href="@{/filedownload(path=${currentpath} + ${pathDelimiter} + ${resource.name})}">Name</a></td>
+    
+    	<!-- Last Modified Date -->
+    	<td><a href="#" th:class="${currentpath}${pathDelimiter}${resource.name}" th:text="${resource.lastModifiedDate}" th:onclick="|doFtp('filelist', 'my text')|" >Last Modified</a></td>
+	</tr> 
+   </table>
+   </pre>
+</body>
+</html>
